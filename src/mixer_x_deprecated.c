@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "SDL_mixer.h"
+#include "SDL_mixerX.h"
 
 /*
     Deprecated SDL Mixer X's functions.

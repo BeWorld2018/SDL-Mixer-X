@@ -78,7 +78,7 @@
 
 /* The TiMidity configuration file */
 #ifndef TIMIDITY_CFG
-#define TIMIDITY_CFG "timidity.cfg"
+#define TIMIDITY_CFG "LIBS:timidity/timidity.cfg"
 #endif
 
 /* These affect general volume */

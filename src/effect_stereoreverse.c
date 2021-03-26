@@ -24,7 +24,7 @@
   effect callback API. They are meant for speed over quality.  :)
 */
 
-#include "SDL_mixer.h"
+#include "SDL_mixerX.h"
 
 #define MIX_INTERNAL_EFFECT__
 #include "effects_internal.h"

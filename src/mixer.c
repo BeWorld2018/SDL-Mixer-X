@@ -21,7 +21,7 @@
 
 #include "SDL.h"
 
-#include "SDL_mixer.h"
+#include "SDL_mixerX.h"
 #include "mixer.h"
 #include "music.h"
 #include "load_aiff.h"
@@ -249,8 +249,28 @@ static void *Mix_DoEffects(int chan, void *snd, int len)
 }
 
 
+#ifdef __MORPHOS__
+extern struct Library *SDL2MixerBaseX;
+#define SAVEDS __saveds
+/* This function must preserve all registers except r13 */
+asm
+("\n"
+"	.section \".text\"\n"
+"	.align 2\n"
+"	.type __restore_r13, @function\n"
+"__restore_r13:\n"
+"	lwz 13, 36(3)\n"
+"	blr\n"
+"__end__restore_r13:\n"
+"	.size __restore_r13, __end__restore_r13 - __restore_r13\n"
+);
+
+#else
+#define SAVEDS
+#endif
+
 /* Mixing function */
-static void MIXSDLCALL
+static void SAVEDS MIXSDLCALL
 mix_channels(void *udata, Uint8 *stream, int len)
 {
     Uint8 *mix_input;
@@ -364,7 +384,7 @@ mix_channels(void *udata, Uint8 *stream, int len)
     }
 }
 
-#if 0
+#ifndef __MORPHOS__
 static void PrintFormat(char *title, SDL_AudioSpec *fmt)
 {
     printf("%s: %d bit %s audio (%s) at %u Hz\n", title, (fmt->format&0xFF),
@@ -413,7 +433,7 @@ int SDLCALLCC Mix_InitMixer(const SDL_AudioSpec spec, SDL_bool skip_init_check)
     }
     mixer = spec;
 
-#if 0
+#ifndef __MORPHOS__
     PrintFormat("Audio device", &mixer);
 #endif
 
@@ -470,7 +490,11 @@ int SDLCALLCC Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, i
     desired.samples  = chunksize;
     desired.channels = nchannels;
     desired.callback = mix_channels;
+#if defined(__MORPHOS__)
+    desired.userdata = SDL2MixerBaseX;
+#else
     desired.userdata = NULL;
+#endif
 
     /* Check if we can skip initalization */
     if (is_already_initialized(desired)) return(0);

@@ -25,7 +25,7 @@
 */
 
 #include "SDL_endian.h"
-#include "SDL_mixer.h"
+#include "SDL_mixerX.h"
 #include "mixer.h"
 
 #define MIX_INTERNAL_EFFECT__

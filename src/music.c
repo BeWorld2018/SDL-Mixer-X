@@ -22,7 +22,7 @@
 #include "SDL_log.h"
 #include "SDL_timer.h"
 
-#include "SDL_mixer.h"
+#include "SDL_mixerX.h"
 #include "mixer.h"
 #include "music.h"
 
@@ -2136,7 +2136,11 @@ const char* SDLCALLCC Mix_GetSoundFonts(void)
      */
     {
         static char *s_soundfont_paths[] = {
+			#ifdef __MORPHOS__
+			"LIBS:soundfonts/FatBoy-v0.790.sf2"
+			#else
             "/usr/share/sounds/sf2/FluidR3_GM.sf2"  /* Remember to add ',' here */
+			#endif
         };
         unsigned i;
 
@@ -2167,7 +2171,7 @@ int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), voi
         return 0;
     }
 
-#if defined(_WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(__OS2__) || defined(__MORPHOS__)
 #define PATHSEP ";"
 #else
 #define PATHSEP ":;"
