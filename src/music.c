@@ -636,6 +636,12 @@ static Mix_MusicType xmi_compatible_midi_player()
     }
 #endif
 
+#if defined(MUSIC_MID_FLUIDLITE)
+    if (mididevice_current == MIDI_Fluidsynth) {
+        return MUS_MID;
+    }
+#endif
+
 #if defined(MUSIC_MID_ADLMIDI) && defined(MUSIC_MID_OPNMIDI)
     if ((mididevice_current != MIDI_ADLMIDI) && (mididevice_current != MIDI_OPNMIDI)) {
         return MUS_ADLMIDI;
@@ -860,7 +866,7 @@ Mix_MusicType detect_music_type(SDL_RWops *src)
     if ((SDL_memcmp(magic, "RIFF", 4) == 0) && (SDL_memcmp(magic + 8, "RMID", 4) == 0)) {
         return MUS_MID;
     }
-#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT)
+#if defined(MUSIC_MID_ADLMIDI) || defined(MUSIC_MID_OPNMIDI) || defined(MUSIC_MID_NATIVE_ALT) || defined(MUSIC_MID_FLUIDLITE)
     if (SDL_memcmp(magic, "MUS\x1A", 4) == 0) {
         return xmi_compatible_midi_player();
     }
@@ -2157,8 +2163,12 @@ const char* SDLCALLCC Mix_GetSoundFonts(void)
 
 int SDLCALLCC Mix_EachSoundFont(int (SDLCALL *function)(const char*, void*), void *data)
 {
+    return Mix_EachSoundFontEx(Mix_GetSoundFonts(), function, data);
+}
+
+int SDLCALLCC Mix_EachSoundFontEx(const char* cpaths, int (SDLCALL *function)(const char*, void*), void *data)
+{
     char *context, *path, *paths;
-    const char* cpaths = Mix_GetSoundFonts();
     int soundfonts_found = 0;
 
     if (!cpaths) {
@@ -2204,21 +2214,21 @@ int SDLCALLCC Mix_SetMidiPlayer(int player)
 {
 #ifdef MUSIC_USE_MIDI
     switch (player) {
-        #ifdef MUSIC_MID_ADLMIDI
+#   ifdef MUSIC_MID_ADLMIDI
     case MIDI_ADLMIDI:
-        #endif
-        #ifdef MUSIC_MID_OPNMIDI
+#   endif
+#   ifdef MUSIC_MID_OPNMIDI
     case MIDI_OPNMIDI:
-        #endif
-        #ifdef MUSIC_MID_TIMIDITY
+#   endif
+#   ifdef MUSIC_MID_TIMIDITY
     case MIDI_Timidity:
-        #endif
-        #ifdef MUSIC_MID_NATIVE
+#   endif
+#   ifdef MUSIC_MID_NATIVE
     case MIDI_Native:
-        #endif
-        #ifdef MUSIC_MID_FLUIDSYNTH
+#   endif
+#   ifdef MUSIC_MID_FLUIDSYNTH
     case MIDI_Fluidsynth:
-        #endif
+#   endif
         mididevice_current = player;
         return 0;
     default:
